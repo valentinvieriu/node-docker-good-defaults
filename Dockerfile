@@ -1,5 +1,5 @@
 # if you're doing anything beyond your local machine, please pin this to a specific version at https://hub.docker.com/_/node/
-FROM node:6
+FROM node:8.8.1-alpine
 
 RUN mkdir -p /opt/app
 
@@ -13,12 +13,13 @@ ARG PORT=80
 ENV PORT $PORT
 EXPOSE $PORT 5858 9229
 
+RUN apk add --no-cache curl
 # check every 30s to ensure this service returns HTTP 200
 HEALTHCHECK CMD curl -fs http://localhost:$PORT/healthz || exit 1
 
 # install dependencies first, in a different location for easier app bind mounting for local development
 WORKDIR /opt
-COPY package.json /opt
+COPY package.json package-lock.json /opt/
 RUN npm install && npm cache clean --force
 ENV PATH /opt/node_modules/.bin:$PATH
 
